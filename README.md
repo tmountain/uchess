@@ -185,4 +185,4 @@ only UCI engine that is officially supported.
 **uchess** depends heavily on the [notnil/chess](https://github.com/notnil/chess)
 and [freeve/uci](https://github.com/freeeve/uci) modules. Many thanks to the maintainers.
 
-Lastly, **uchess** heavily inspired by [nickzuber/chs](https://github.com/nickzuber/chs).
+Lastly, **uchess** is heavily inspired by [nickzuber/chs](https://github.com/nickzuber/chs).
