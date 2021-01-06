@@ -1,15 +1,19 @@
 # uchess
 
-> Play chess in your terminal.
+> ♛♔ Play chess in your terminal.
 
-[![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://raw.githubusercontent.com/tmountain/uchess/master/LICENSE)
+<a href="https://github.com/tmountain/uchess/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/tmountain/uchess"></a>
+<a href="https://github.com/tmountain/uchess/network"><img alt="GitHub forks" src="https://img.shields.io/github/forks/tmountain/uchess"></a>
+<a href="https://github.com/tmountain/uchess/blob/main/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/tmountain/uchess?color=blue"></a>
+<a href="https://goreportcard.com/report/github.com/tmountain/uchess"><img src="https://goreportcard.com/badge/github.com/gobuffalo/release" alt="Go Report Card" /></a>
 
 ![uchess screenshot](/assets/uchess.png)
 
 ## Introduction
 
 **uchess** is an interactive terminal chess client designed to allow
-gameplay and move analysis in conjunction with UCI chess engines.
+gameplay and move analysis in conjunction with
+[UCI chess engines](https://en.wikipedia.org/wiki/Universal_Chess_Interface).
 
 **uchess** is highly configurable, fully themeable, and capable of
 supporting a variety of play scenarios including human vs. human,
@@ -36,7 +40,7 @@ An example of a board snapshot:
 **uchess** can be installed using "go get".
 
 ```bash
-go get -u github.com/tmountain/uchess
+go get github.com/tmountain/uchess/cmd/uchess
 ```
 
 ## Usage
@@ -82,6 +86,70 @@ to be a move specified in algebraic notation.
       O-O        King castles on kingside.
       O-O-O      King castles on queenside.
       e8=Q       Pawn promotion to queen.
+```
+
+### Config Example
+
+```json
+{
+  "uciWhite": "stockfish",
+  "uciBlack": "stockfish",
+  "uciHint": "stockfish",
+  "uciEngines": [
+    {
+      "name": "stockfish",
+      "engine": "/usr/games/stockfish",
+      "hash": 128,
+      "ponder": false,
+      "ownBook": false,
+      "multiPV": 4,
+      "depth": 0,
+      "searchMoves": "",
+      "moveTime": 3000,
+      "options": [
+        {
+          "name": "skill level",
+          "value": "20"
+        }
+      ]
+    }
+  ],
+  "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  "activeTheme": "basic",
+  "theme": [
+    {
+      "name": "basic",
+      "moveLabelBg": "#d0d0d0",
+      "moveLabelFg": "#000000",
+      "squareDark": "#d78700",
+      "squareLight": "#ffaf5f",
+      "squareHigh": "#5fffaf",
+      "squareHint": "#af87ff",
+      "squareCheck": "#ff87d7",
+      "white": "#eeeeee",
+      "black": "#080808",
+      "msg": "#d70000",
+      "rank": "#9e9e9e",
+      "file": "#9e9e9e",
+      "prompt": "#d70000",
+      "meterBase": "#585858",
+      "meterMid": "#0",
+      "meterNeutral": "#00d7ff",
+      "meterWin": "#87ffd7",
+      "meterLose": "#d75f5f",
+      "playerNames": "#0",
+      "score": "#9e9e9e",
+      "moveBox": "#0",
+      "emoji": "#0",
+      "input": "#0",
+      "advantage": "#9e9e9e"
+    }
+  ],
+  "whitePiece": "human",
+  "blackPiece": "cpu",
+  "whiteName": "",
+  "blackName": ""
+}
 ```
 
 ### Base Config Format
@@ -184,6 +252,8 @@ only UCI engine that is officially supported.
 ### Special Thanks
 **uchess** depends on the [notnil/chess](https://github.com/notnil/chess),
 and [freeve/uci](https://github.com/freeeve/uci), and
-[gdamore/tcell](https://github.com/gdamore/tcell) modules. Many thanks to the maintainers.
+[gdamore/tcell](https://github.com/gdamore/tcell) modules.
+Themes are bundled using [markbates/pkger](https://github.com/markbates/pkger).
+Many thanks to the maintainers.
 
 Lastly, **uchess** is heavily inspired by [nickzuber/chs](https://github.com/nickzuber/chs).
