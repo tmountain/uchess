@@ -27,6 +27,10 @@ as-needed basis to facilitate game tree exploration.
 Game moves are input as algebraic notation via an interactive command
 shell, and a variety of auxillary commands are supported.
 
+An example of a board snapshot:
+
+![uchess board snapshot](assets/snapshot.png)
+
 ## Installation
 
 **uchess** can be installed using "go get".
@@ -51,28 +55,6 @@ $ uchess -cfg uchess.json
 
 With zero configuration, uchess will attempt to invoke stockfish
 via /usr/local/bin/stockfish with difficulty level 20.
-
-### Features
-
-**uchess** is highly configurable, fully themeable, and capable of
-supporting a variety of play scenarios including human vs. human,
-human vs. cpu, and cpu vs. cpu.
-
-Games may be initialized via FEN notation and exported to PGN notation
-for further analysis in third-party engines. Additionally, board
-snapshots may be saved to SVG image format for the purpose of sharing
-or archiving board state.
-
-A hint engine is provided to assist players in discovering the best
-move in a given scenario and game state may be walked backward on an
-as-needed basis to facilitate game tree exploration.
-
-Game moves are input as algebraic notation via an interactive command
-shell, and a variety of auxillary commands are supported.
-
-An example of a board snapshot:
-
-![uchess board snapshot](assets/snapshot.png)
 
 ### Commands
 
