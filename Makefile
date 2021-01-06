@@ -17,3 +17,6 @@ build: tidy
 
 release:
 	rm -rf dist && goreleaser
+
+release_test:
+	rm -rf dist && goreleaser --snapshot --skip-publish --rm-dist

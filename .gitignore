@@ -15,6 +15,7 @@
 
 # Build directories
 bin/
+dist/
 
 # Dependency directories (remove the comment below to include it)
 arch/

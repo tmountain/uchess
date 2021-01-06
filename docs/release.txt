@@ -1,0 +1,12 @@
+Process for a release is as follows:
+
+GoReleaser will use the latest Git tag of your repository. Create a tag and push it to GitHub:
+
+git tag -a v0.1.0 -m "First release"
+git push origin v0.1.0
+
+Then run:
+
+make release
+
+Release notes can be edited on Github.
