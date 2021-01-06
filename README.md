@@ -131,7 +131,7 @@ builtin themes.
 
 The builtin themes are packaged into the uchess binary using pkger, and
 it is necessary to invoke this command before compilation when a theme
-is added to the themes project directory.
+is added to the [themes project directory](/themes).
 
 Pull requests for new builtin themes are welcome; however, the specified
 colors must fall under the xterm-256 standard. A color chart is available
@@ -182,7 +182,8 @@ This will be resolved in a future release. For the moment, stockfish is the
 only UCI engine that is officially supported.
 
 ### Special Thanks
-**uchess** depends heavily on the [notnil/chess](https://github.com/notnil/chess)
-and [freeve/uci](https://github.com/freeeve/uci) modules. Many thanks to the maintainers.
+**uchess** depends on the [notnil/chess](https://github.com/notnil/chess),
+and [freeve/uci](https://github.com/freeeve/uci), and
+[gdamore/tcell](https://github.com/gdamore/tcell) modules. Many thanks to the maintainers.
 
 Lastly, **uchess** is heavily inspired by [nickzuber/chs](https://github.com/nickzuber/chs).
