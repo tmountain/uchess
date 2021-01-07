@@ -40,7 +40,7 @@ An example of a board snapshot:
 **uchess** can be installed using "go get".
 
 ```bash
-go get github.com/tmountain/uchess/cmd/uchess
+go get -u github.com/tmountain/uchess/cmd/uchess
 ```
 
 ## Usage
