@@ -75,6 +75,8 @@ dist
 │   └── uchess
 └── uchess_windows_amd64
     └── uchess.exe
+=======
+go get -u github.com/tmountain/uchess/cmd/uchess
 ```
 
 ## Usage
