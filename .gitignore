@@ -3,6 +3,7 @@
 *.exe~
 *.dll
 *.so
+*.swp
 *.dylib
 .vscode
 .DS_Store
@@ -13,9 +14,10 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Build directories
+# Build directories and binaries
 bin/
 dist/
+cmd/uchess/uchess
 
 # Dependency directories (remove the comment below to include it)
 arch/

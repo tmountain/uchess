@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"runtime"
 
 	"github.com/markbates/pkger"
 )
@@ -24,6 +25,9 @@ type Config struct {
 	BlackName   string      `json:"blackName"`
 }
 
+var winStockfish = "C:\\stockfish\\stockfish.exe"
+var defStockfish = "/usr/local/bin/stockfish"
+
 // HasTheme returns a bool indicating whether the config
 // contains a theme of the name provided
 func HasTheme(name string, themes []ThemeHex) bool {
@@ -35,6 +39,27 @@ func HasTheme(name string, themes []ThemeHex) bool {
 	return false
 }
 
+// DefaultUCIPath makes an attempt to find a viable UCI engine
+func DefaultUCIPath() string {
+	if runtime.GOOS == "windows" {
+		return winStockfish
+	}
+
+	// Places to look for stockfish on Linux/Mac
+	stockfishPaths := []string{
+		"/usr/bin/stockfish",
+		"/usr/games/stockfish",
+	}
+
+	for _, path := range stockfishPaths {
+		if FileExists(path) {
+			return path
+		}
+	}
+
+	return defStockfish
+}
+
 // DefaultOptions defines any default UCI options
 var DefaultOptions = []Option{
 	{"skill level", "20"}, // stockfish skill level
@@ -42,15 +67,15 @@ var DefaultOptions = []Option{
 
 var uciEngines = []UCIEngine{
 	{
-		"stockfish",            // Name
-		"/usr/games/stockfish", // Path
-		128,                    // Hash
-		false,                  // Ponder
-		false,                  // OwnBook
-		4,                      // MultiPV
-		0,                      // Depth
-		"",                     // SearchMoves
-		3000,                   // MoveTime
+		"stockfish",      // Name
+		DefaultUCIPath(), // Path
+		128,              // Hash
+		false,            // Ponder
+		false,            // OwnBook
+		4,                // MultiPV
+		0,                // Depth
+		"",               // SearchMoves
+		3000,             // MoveTime
 		DefaultOptions,
 	},
 }
@@ -89,7 +114,7 @@ var DefaultConfig = Config{
 	uciEngines,   // UCIEngine
 	defaultFEN,   // FEN
 	"basic",      // ActiveTheme
-	ReadThemes(), // Themes
+	[]ThemeHex{}, // Themes
 	"human",      // WhitePiece
 	"cpu",        // BlackPiece
 	"",           // WhiteName
@@ -98,6 +123,10 @@ var DefaultConfig = Config{
 
 // ConfigJSON returns the JSON encoded representation of the config
 func ConfigJSON() string {
+	config := DefaultConfig
+	// Just include the basic theme in the default config as a reference
+	config.Themes = []ThemeHex{ThemeBasic.Hex()}
+
 	c, err := json.MarshalIndent(&DefaultConfig, "", "    ")
 	if err != nil {
 		panic(err)

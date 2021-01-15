@@ -37,28 +37,79 @@ An example of a board snapshot:
 
 ## Installation
 
-**uchess** can be installed using "go get".
+The easiest way to get **uchess** is via an
+[official release](https://github.com/tmountain/uchess/releases).
+
+**uchess** can also be installed using "go get".
+A valid GOPATH is required to use the `go get` command.
+If $GOPATH is not specified, $HOME/go will be used by default.
 
 ```bash
-go get github.com/tmountain/uchess/cmd/uchess
+$ go get github.com/tmountain/uchess/cmd/uchess
+```
+
+## Build
+
+**uchess** includes a Makefile which will build a binary
+for your native architecture. Building uchess requires the
+[pkger](https://github.com/markbates/pkger) binary, which
+is also installed via "go get".
+
+```bash
+$ go get github.com/markbates/pkger/cmd/pkger
+$ make build
+$ cmd/uchess/uchess
+```
+
+You can also cross compile via `make release_test`.
+
+```bash
+$ make release_test
+$ tree dist
+dist
+├── uchess_darwin_amd64
+│   └── uchess
+├── uchess_linux_amd64
+│   └── uchess
+├── uchess_linux_arm_5
+│   └── uchess
+└── uchess_windows_amd64
+    └── uchess.exe
 ```
 
 ## Usage
 
 ### Generate a **uchess** config and edit it accordingly.
 
+Mac and Linux
+
 ```bash
 $ uchess -tmpl > uchess.json
 ```
 
+Windows
+
+```
+# Avoid BOM in config file
+> .\uchess.exe -tpl | set-content uchess.json -Encoding Ascii
+```
+
 Run **uchess** on the config.
+
+Mac and Linux
 
 ```bash
 $ uchess -cfg uchess.json
 ```
 
-With zero configuration, uchess will attempt to invoke stockfish
-via /usr/local/bin/stockfish with difficulty level 20.
+Windows
+
+```
+> .\uchess.exe -cfg uchess.json
+```
+
+With zero configuration, uchess will attempt to locate stockfish
+on your system and run it with difficulty level 20.
 
 ### Commands
 

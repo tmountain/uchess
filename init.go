@@ -41,7 +41,7 @@ func setWhitePieceName(c *Config) {
 	}
 }
 
-// Init sets up the app config from flags
+// Init sets up the app config
 func Init() Config {
 	var config Config
 	tmpl := flag.Bool("tmpl", false, "generate config template with defaults")
@@ -80,6 +80,7 @@ func Init() Config {
 	} else {
 		// Zero configuration config (hopefully)
 		config = DefaultConfig
+		config.Themes = ReadThemes()
 	}
 
 	config.WhitePiece = *white

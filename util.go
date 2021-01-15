@@ -3,6 +3,8 @@ package uchess
 import (
 	"fmt"
 	"math"
+	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -211,4 +213,15 @@ func EmojiForPlayer(playerType string) string {
 		return "🤖"
 	}
 	return "👤"
+}
+
+// IsWindows returns a boolean indicating whether windows is the OS
+func IsWindows() bool {
+	return runtime.GOOS == "windows"
+}
+
+// FileExists returns a bool indicating whether the specified file exists
+func FileExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }
