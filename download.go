@@ -202,7 +202,7 @@ func FindOrFetchStockfish() string {
 				fmt.Println("Attempt an automated install? [y/n] ")
 				reader := bufio.NewReader(os.Stdin)
 				resp, _ = reader.ReadString('\n')
-				resp = strings.ToLower(resp)
+				resp = strings.TrimSpace(strings.ToLower(resp))
 			}
 
 			if resp == "yes" || resp == "y" {
