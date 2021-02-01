@@ -199,7 +199,7 @@ func FindOrFetchStockfish() string {
 		if (runtime.GOOS == "windows" || runtime.GOOS == "linux") && runtime.GOARCH == "amd64" {
 			var resp string
 			for resp != "yes" && resp != "no" && resp != "y" && resp != "n" {
-				fmt.Println("Attempt an automated install? [y/n] ")
+				fmt.Printf("Attempt an automated install? [y/n] ")
 				reader := bufio.NewReader(os.Stdin)
 				resp, _ = reader.ReadString('\n')
 				resp = strings.TrimSpace(strings.ToLower(resp))
