@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"runtime"
 
 	"github.com/markbates/pkger"
 )
@@ -25,9 +24,6 @@ type Config struct {
 	BlackName   string      `json:"blackName"`
 }
 
-var winStockfish = "C:\\stockfish\\stockfish.exe"
-var defStockfish = "/usr/local/bin/stockfish"
-
 // HasTheme returns a bool indicating whether the config
 // contains a theme of the name provided
 func HasTheme(name string, themes []ThemeHex) bool {
@@ -39,27 +35,6 @@ func HasTheme(name string, themes []ThemeHex) bool {
 	return false
 }
 
-// DefaultUCIPath makes an attempt to find a viable UCI engine
-func DefaultUCIPath() string {
-	if runtime.GOOS == "windows" {
-		return winStockfish
-	}
-
-	// Places to look for stockfish on Linux/Mac
-	stockfishPaths := []string{
-		"/usr/bin/stockfish",
-		"/usr/games/stockfish",
-	}
-
-	for _, path := range stockfishPaths {
-		if FileExists(path) {
-			return path
-		}
-	}
-
-	return defStockfish
-}
-
 // DefaultOptions defines any default UCI options
 var DefaultOptions = []Option{
 	{"skill level", "20"}, // stockfish skill level
@@ -67,15 +42,15 @@ var DefaultOptions = []Option{
 
 var uciEngines = []UCIEngine{
 	{
-		"stockfish",      // Name
-		DefaultUCIPath(), // Path
-		128,              // Hash
-		false,            // Ponder
-		false,            // OwnBook
-		4,                // MultiPV
-		0,                // Depth
-		"",               // SearchMoves
-		3000,             // MoveTime
+		"stockfish",            // Name
+		FindOrFetchStockfish(), // Path
+		128,                    // Hash
+		false,                  // Ponder
+		false,                  // OwnBook
+		4,                      // MultiPV
+		0,                      // Depth
+		"",                     // SearchMoves
+		3000,                   // MoveTime
 		DefaultOptions,
 	},
 }

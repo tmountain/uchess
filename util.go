@@ -225,3 +225,15 @@ func FileExists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
 }
+
+// IsFile returns a bool indicating whether the specified file is a regular file
+func IsFile(path string) bool {
+	fi, err := os.Stat(path)
+
+	if err != nil {
+		return false
+	}
+
+	mode := fi.Mode()
+	return mode.IsRegular()
+}
