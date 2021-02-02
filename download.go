@@ -211,7 +211,13 @@ func FindOrFetchStockfish() string {
 				if success {
 					fmt.Println("Install was successful. Restart uchess.")
 					os.Exit(0)
+				} else {
+					fmt.Println("Install was unsuccessful. Please install Stockfish manually.")
+					os.Exit(0)
 				}
+			} else {
+				fmt.Println("Please see the docs for manual Stockfish configuration.")
+				os.Exit(0)
 			}
 		} else {
 			fmt.Println("Automated install is not supported on your platform.")
@@ -222,6 +228,5 @@ func FindOrFetchStockfish() string {
 			os.Exit(0)
 		}
 	}
-	// unreachable
 	return ""
 }
