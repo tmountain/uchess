@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/artdarek/go-unzip v1.0.0
+	github.com/codeclysm/extract/v3 v3.0.2
 	github.com/dustin/go-humanize v1.0.0
 	github.com/freeeve/uci v1.0.0
 	github.com/gdamore/tcell/v2 v2.0.0

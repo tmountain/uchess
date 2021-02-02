@@ -2,17 +2,20 @@ package uchess
 
 import (
 	"bufio"
+	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 
 	"os"
+	"path"
 	"regexp"
 	"runtime"
 	"strings"
 
-	"github.com/artdarek/go-unzip"
+	"github.com/codeclysm/extract/v3"
 	"github.com/dustin/go-humanize"
 	"github.com/mitchellh/go-homedir"
 )
@@ -52,12 +55,14 @@ func DownloadFile(url string, filepath string) error {
 	// file until it's downloaded fully
 	out, err := os.Create(filepath + ".tmp")
 	if err != nil {
+		fmt.Println(err.Error())
 		return err
 	}
 
 	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
+		fmt.Println(err.Error())
 		return err
 	}
 
@@ -65,6 +70,7 @@ func DownloadFile(url string, filepath string) error {
 	counter := &WriteCounter{}
 	_, err = io.Copy(out, io.TeeReader(resp.Body, counter))
 	if err != nil {
+		fmt.Println(err.Error())
 		return err
 	}
 
@@ -77,6 +83,7 @@ func DownloadFile(url string, filepath string) error {
 	// Rename the tmp file back to the original file
 	err = os.Rename(filepath+".tmp", filepath)
 	if err != nil {
+		fmt.Println(err.Error())
 		return err
 	}
 
@@ -96,11 +103,12 @@ func MatchStockfishWin(file string) bool {
 func FindStockfish(dir string) string {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
+		fmt.Println(err.Error())
 		return ""
 	}
 
 	for _, f := range files {
-		fullPath := fmt.Sprintf("%v%v%v", dir, string(os.PathSeparator), f.Name())
+		fullPath := path.Join(dir, f.Name())
 		if runtime.GOOS == "windows" && MatchStockfishWin(f.Name()) {
 			return f.Name()
 		}
@@ -116,45 +124,122 @@ func ensureUchessDir() string {
 	home, err := homedir.Dir()
 
 	if err != nil {
+		fmt.Println(err.Error())
 		return ""
 	}
 
-	uchessDir := fmt.Sprintf("%v%v%v", home, string(os.PathSeparator), "uchess")
+	uchessDir := path.Join(home, "uchess")
 	if !FileExists(uchessDir) {
 		err = os.Mkdir(uchessDir, os.ModeDir)
 		if err != nil {
+			fmt.Println(err.Error())
 			return ""
 		}
 	}
 	return uchessDir
 }
 
+func isStockfishBin(file string) bool {
+	return strings.HasPrefix(file, "stockfish") && !strings.HasSuffix(file, ".zip")
+}
+
 var stockfishWin = "https://stockfishchess.org/files/stockfish_12_win_x64.zip"
 var stockfishLin = "https://stockfishchess.org/files/stockfish_12_linux_x64.zip"
 
-func downloadStockfish() bool {
-	var stockfish string
+func mkDownloadDir() (string, error) {
+	// Create a temp directory to hold the download
+	tmp := os.Getenv("TMP")
+	dir, err := ioutil.TempDir(tmp, "uchess")
 
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+	return dir, nil
+}
+
+func extractZip(dlDir, dlPath string) error {
+	zipData, err := ioutil.ReadFile(dlPath)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	buffer := bytes.NewBuffer(zipData)
+	if err = extract.Zip(context.Background(), buffer, dlDir, nil); err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	return nil
+}
+
+func findTmpStockfish(dlDir string) (string, error) {
+	files, err := ioutil.ReadDir(dlDir)
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+
+	for _, file := range files {
+		fileName := file.Name()
+		if isStockfishBin(fileName) {
+			return path.Join(dlDir, fileName), nil
+		}
+	}
+	return "", nil
+}
+
+func stockfishFilename() string {
+	if runtime.GOOS == "windows" {
+		return "stockfish.exe"
+	}
+	return "stockfish"
+}
+
+func downloadStockfish() bool {
+	var stockfish, dlDir, sfPath string
+	var err error
+
+	// Windows/amd64 and Linux/amd64 support automated download/install
 	if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {
 		stockfish = stockfishWin
 	} else if runtime.GOOS == "linux" && runtime.GOARCH == "amd64" {
 		stockfish = stockfishLin
 	}
 
+	// Set up a temp download dir
+	if dlDir, err = mkDownloadDir(); err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+	// Clean up the temp dir when finished
+	defer os.RemoveAll(dlDir)
+
+	// dlPath is the full path that the initial zip was saved to
+	dlPath := path.Join(dlDir, "stockfish.zip")
+	if err = DownloadFile(stockfish, dlPath); err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+
+	// Extract the zip to the temp location
+	if err = extractZip(dlDir, dlPath); err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+
+	// Locate the extracted stockfish binary
+	if sfPath, err = findTmpStockfish(dlDir); err != nil || sfPath == "" {
+		fmt.Println(err.Error())
+		return false
+	}
+
+	// Move and rename the extracted binary
 	if uchessDir := ensureUchessDir(); uchessDir != "" {
-		file := fmt.Sprintf("%v%v%v", uchessDir, string(os.PathSeparator), "stockfish.zip")
-		err := DownloadFile(stockfish, file)
-
-		if err != nil {
+		finalPath := path.Join(uchessDir, stockfishFilename())
+		if err = os.Rename(sfPath, finalPath); err != nil {
 			fmt.Println(err.Error())
-			return false
-		}
-
-		uz := unzip.New(file, uchessDir)
-		err = uz.Extract()
-
-		if err != nil {
-			fmt.Println(err)
 			return false
 		}
 	}
@@ -184,8 +269,9 @@ func FindOrFetchStockfish() string {
 	}
 
 	foundStockfish := false
+	fmt.Println("Looking for stockfish...")
 	for _, p := range paths {
-		fmt.Printf("Search: %v\n", p)
+		fmt.Printf("Check: %v\n", p)
 		searchResult := FindStockfish(p)
 		if searchResult != "" {
 			fmt.Printf("Found: %v%v%v\n", p, string(os.PathSeparator), searchResult)
@@ -220,7 +306,7 @@ func FindOrFetchStockfish() string {
 				os.Exit(0)
 			}
 		} else {
-			fmt.Println("Automated install is not supported on your platform.")
+			fmt.Println("Automated installation is not supported on your platform.")
 			fmt.Println("Please install Stockfish using your package manager ")
 			fmt.Println("or download a binary from the official website and ")
 			fmt.Printf("make sure the executable is in your path.\n\n")
