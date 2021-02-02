@@ -249,18 +249,20 @@ func downloadStockfish() bool {
 // FindOrFetchStockfish attempts to load Stockfish via the path and attempts
 // to download the binary for a limited number of platforms
 func FindOrFetchStockfish() string {
-	var pathDelim string
+	var pathDelim, dirName string
 
 	if runtime.GOOS == "windows" {
 		pathDelim = ";"
+		dirName = "uchess"
 	} else {
+		dirName = ".uchess"
 		pathDelim = ":"
 	}
 
 	path := os.Getenv("PATH")
 	paths := strings.Split(path, pathDelim)
 	homeDir, err := homedir.Dir()
-	uchessDir := fmt.Sprintf("%v%v%v", homeDir, string(os.PathSeparator), "uchess")
+	uchessDir := fmt.Sprintf("%v%v%v", homeDir, string(os.PathSeparator), dirName)
 
 	if err != nil {
 		fmt.Println(err.Error())
