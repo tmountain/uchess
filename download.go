@@ -128,7 +128,7 @@ func ensureUchessDir() string {
 		return ""
 	}
 
-	uchessDir := path.Join(home, "uchess")
+	uchessDir := path.Join(home, uchessDirName())
 	if !FileExists(uchessDir) {
 		err = os.Mkdir(uchessDir, os.ModeDir)
 		if err != nil {
@@ -246,23 +246,28 @@ func downloadStockfish() bool {
 	return true
 }
 
+func uchessDirName() string {
+	if runtime.GOOS == "windows" {
+		return "uchess"
+	}
+	return ".uchess"
+}
+
+func pathDelim() string {
+	if runtime.GOOS == "windows" {
+		return ";"
+	}
+	return ":"
+}
+
 // FindOrFetchStockfish attempts to load Stockfish via the path and attempts
 // to download the binary for a limited number of platforms
 func FindOrFetchStockfish() string {
-	var pathDelim, dirName string
-
-	if runtime.GOOS == "windows" {
-		pathDelim = ";"
-		dirName = "uchess"
-	} else {
-		dirName = ".uchess"
-		pathDelim = ":"
-	}
-
-	path := os.Getenv("PATH")
-	paths := strings.Split(path, pathDelim)
+	pathDelim := pathDelim()
+	osPath := os.Getenv("PATH")
+	paths := strings.Split(osPath, pathDelim)
 	homeDir, err := homedir.Dir()
-	uchessDir := fmt.Sprintf("%v%v%v", homeDir, string(os.PathSeparator), dirName)
+	uchessDir := path.Join(homeDir, uchessDirName())
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -277,7 +282,7 @@ func FindOrFetchStockfish() string {
 		searchResult := FindStockfish(p)
 		if searchResult != "" {
 			fmt.Printf("Found: %v%v%v\n", p, string(os.PathSeparator), searchResult)
-			return fmt.Sprintf("%v%v%v", p, string(os.PathSeparator), searchResult)
+			return path.Join(p, searchResult)
 		}
 	}
 
