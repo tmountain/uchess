@@ -93,7 +93,7 @@ func DownloadFile(url string, filepath string) error {
 // MatchStockfishWin returns a boolean indicating whether a given file
 // looks like the stockfish executable (Windows). Fuzzy matching is applied
 func MatchStockfishWin(file string) bool {
-	stockfishExe := regexp.MustCompile(`(?i)^stockfish.+\.exe$`)
+	stockfishExe := regexp.MustCompile(`(?i)^stockfish.*\.exe$`)
 	return stockfishExe.MatchString(file)
 }
 
