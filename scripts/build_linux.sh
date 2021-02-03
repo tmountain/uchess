@@ -1,4 +1,0 @@
-#!/bin/bash
-
-mkdir -p ./arch/linux/bin
-env GOOS=linux GOARCH=amd64 go build -o ./arch/linux/bin ./cmd/...

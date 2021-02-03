@@ -53,7 +53,8 @@ func Init() Config {
 	flag.Parse()
 
 	if *tmpl {
-		fmt.Println(ConfigJSON())
+		defaultCfg := MakeDefault()
+		fmt.Println(ConfigJSON(defaultCfg))
 		os.Exit(0)
 	}
 
@@ -73,14 +74,21 @@ func Init() Config {
 
 	// Load config file if provided
 	// Override command line flags for black/white
+	// If UCI engine is specified in config, it is taken at face value
 	if *cfg != "" {
 		config = ReadConfig(*cfg)
 		*white = config.WhitePiece
 		*black = config.BlackPiece
 	} else {
 		// Zero configuration config (hopefully)
-		config = DefaultConfig
+		config = MakeDefault()
 		config.Themes = ReadThemes()
+		uciPath := config.UCIEngines[0].Path
+
+		// If the UCI engine cannot be found, prompt to install if applicable
+		if !IsFile(uciPath) {
+			FetchStockfish()
+		}
 	}
 
 	config.WhitePiece = *white

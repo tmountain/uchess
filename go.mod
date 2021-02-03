@@ -3,7 +3,6 @@ module github.com/tmountain/uchess
 go 1.13
 
 require (
-	github.com/artdarek/go-unzip v1.0.0
 	github.com/codeclysm/extract/v3 v3.0.2
 	github.com/dustin/go-humanize v1.0.0
 	github.com/freeeve/uci v1.0.0

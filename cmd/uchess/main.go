@@ -6,7 +6,7 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/notnil/chess"
-	"github.com/tmountain/uchess"
+	uchess "github.com/tmountain/uchess/pkg"
 )
 
 func main() {

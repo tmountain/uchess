@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 
 	"github.com/markbates/pkger"
 )
@@ -40,19 +41,18 @@ var DefaultOptions = []Option{
 	{"skill level", "20"}, // stockfish skill level
 }
 
-var uciEngines = []UCIEngine{
-	{
-		"stockfish",            // Name
-		FindOrFetchStockfish(), // Path
-		128,                    // Hash
-		false,                  // Ponder
-		false,                  // OwnBook
-		4,                      // MultiPV
-		0,                      // Depth
-		"",                     // SearchMoves
-		3000,                   // MoveTime
-		DefaultOptions,
-	},
+// DefaultEngine is a placeholder for the default UCI engine
+var defaultEngine = UCIEngine{
+	"stockfish", // Name
+	"",          // Path to UCI (filled in dynamically)
+	128,         // Hash
+	false,       // Ponder
+	false,       // OwnBook
+	4,           // MultiPV
+	0,           // Depth
+	"",          // SearchMoves
+	3000,        // MoveTime
+	DefaultOptions,
 }
 
 // defaultFEN is the default board position
@@ -82,27 +82,43 @@ func ReadThemes() []ThemeHex {
 }
 
 // DefaultConfig defines the default configuration
-var DefaultConfig = Config{
-	"stockfish",  // UCIWhite
-	"stockfish",  // UCIBlack
-	"stockfish",  // UCIHint
-	uciEngines,   // UCIEngine
-	defaultFEN,   // FEN
-	"basic",      // ActiveTheme
-	[]ThemeHex{}, // Themes
-	"human",      // WhitePiece
-	"cpu",        // BlackPiece
-	"",           // WhiteName
-	"",           // BlackName
+var defaultConfig = Config{
+	"stockfish",   // UCIWhite
+	"stockfish",   // UCIBlack
+	"stockfish",   // UCIHint
+	[]UCIEngine{}, // UCIEngine
+	defaultFEN,    // FEN
+	"basic",       // ActiveTheme
+	[]ThemeHex{},  // Themes
+	"human",       // WhitePiece
+	"cpu",         // BlackPiece
+	"",            // WhiteName
+	"",            // BlackName
+}
+
+// MakeDefault creates the default config
+func MakeDefault() Config {
+	config := defaultConfig
+	engine := defaultEngine
+	// Try to find stockfish in the path
+	stockfish := FindStockfish()
+
+	// If stockfish cannot be found, set the config to the AppDir
+	if stockfish == "" {
+		stockfish = path.Join(AppDir(), StockfishFilename())
+	}
+
+	engine.Path = stockfish
+	config.UCIEngines = []UCIEngine{engine}
+	return config
 }
 
 // ConfigJSON returns the JSON encoded representation of the config
-func ConfigJSON() string {
-	config := DefaultConfig
+func ConfigJSON(config Config) string {
 	// Just include the basic theme in the default config as a reference
 	config.Themes = []ThemeHex{ThemeBasic.Hex()}
 
-	c, err := json.MarshalIndent(&DefaultConfig, "", "    ")
+	c, err := json.MarshalIndent(&config, "", "    ")
 	if err != nil {
 		panic(err)
 	}

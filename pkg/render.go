@@ -70,7 +70,7 @@ func drawSquare(s tcell.Screen, col, row int, p chess.Piece, sqBg tcell.Color, t
 	}
 }
 
-// Draw rank draws the rank (row indicator)
+// drawRank draws the rank (row indicator)
 func drawRank(s tcell.Screen, col, row int, r chess.Rank, t Theme) {
 	// drawRune wants a rune
 	rank, _ := utf8.DecodeRuneInString(r.String())
@@ -79,8 +79,8 @@ func drawRank(s tcell.Screen, col, row int, r chess.Rank, t Theme) {
 	drawRune(s, col, row, rankStyle, rank)
 }
 
-// DrawMoveLabel displays the current move above the board
-func DrawMoveLabel(s tcell.Screen, game *chess.Game, t Theme) {
+// drawMoveLabel displays the current move above the board
+func drawMoveLabel(s tcell.Screen, game *chess.Game, t Theme) {
 	var nextPlayer string
 	playerTurn := game.Position().Turn()
 
@@ -100,8 +100,8 @@ func DrawMsgLabel(s tcell.Screen, msg string, t Theme) {
 	drawText(s, leftMargin, topMargin, labelStyle, msg)
 }
 
-// DrawPlayers displays the names of the players and their scores
-func DrawPlayers(s tcell.Screen, config Config, game *chess.Game, t Theme) {
+// drawPlayers displays the names of the players and their scores
+func drawPlayers(s tcell.Screen, config Config, game *chess.Game, t Theme) {
 	leftMargin := leftMargin + 22
 	emojiStyle := tcell.StyleDefault.Foreground(t.Emoji)
 	black := fmt.Sprintf("%v %v", EmojiForPlayer(config.BlackPiece), config.BlackName)
@@ -119,8 +119,8 @@ func DrawPlayers(s tcell.Screen, config Config, game *chess.Game, t Theme) {
 	drawText(s, leftMargin, topMargin+7, advStyle, whiteRes)
 }
 
-// DrawScore displays the current game score
-func DrawScore(s tcell.Screen, cp int, game *chess.Game, t Theme) {
+// drawScore displays the current game score
+func drawScore(s tcell.Screen, cp int, game *chess.Game, t Theme) {
 	topMargin := topMargin + 13
 	leftMargin := leftMargin
 	prob := WinProb(cp) * 100
@@ -141,19 +141,19 @@ func DrawScore(s tcell.Screen, cp int, game *chess.Game, t Theme) {
 
 // Render draws the screen
 func Render(gs *GameState) {
-	DrawMoveLabel(gs.S, gs.Game, gs.Theme)
-	DrawBoard(gs.S, gs.Game, gs.Theme, gs.CheckWhite, gs.CheckBlack, gs.Hint)
-	DrawPrompt(gs.S, gs.Input, gs.Theme)
-	DrawScore(gs.S, gs.Score, gs.Game, gs.Theme)
-	DrawScoreMeter(gs.S, gs.Score, gs.Theme)
-	DrawPlayers(gs.S, gs.Config, gs.Game, gs.Theme)
-	DrawMoves(gs.S, gs.Game, gs.Theme)
+	drawMoveLabel(gs.S, gs.Game, gs.Theme)
+	drawBoard(gs.S, gs.Game, gs.Theme, gs.CheckWhite, gs.CheckBlack, gs.Hint)
+	drawPrompt(gs.S, gs.Input, gs.Theme)
+	drawScore(gs.S, gs.Score, gs.Game, gs.Theme)
+	drawScoreMeter(gs.S, gs.Score, gs.Theme)
+	drawPlayers(gs.S, gs.Config, gs.Game, gs.Theme)
+	drawMoves(gs.S, gs.Game, gs.Theme)
 	// Update screen
 	gs.S.Show()
 }
 
-// DrawScoreCell draws a cell of the score meter
-func DrawScoreCell(s tcell.Screen, cp, idx int, t Theme) {
+// drawScoreCell draws a cell of the score meter
+func drawScoreCell(s tcell.Screen, cp, idx int, t Theme) {
 	block := '█'
 	// At 8 start at top margin moving down as idx decreases
 	ypos := topMargin - idx + 8
@@ -184,15 +184,15 @@ func DrawScoreCell(s tcell.Screen, cp, idx int, t Theme) {
 	}
 }
 
-// DrawScoreMeter displays a graphical representation of the score
-func DrawScoreMeter(s tcell.Screen, cp int, t Theme) {
+// drawScoreMeter displays a graphical representation of the score
+func drawScoreMeter(s tcell.Screen, cp int, t Theme) {
 	for i := 8; i > 0; i-- {
-		DrawScoreCell(s, cp, i, t)
+		drawScoreCell(s, cp, i, t)
 	}
 }
 
-// DrawPrompt draws the prompt
-func DrawPrompt(s tcell.Screen, i *Input, t Theme) {
+// drawPrompt draws the prompt
+func drawPrompt(s tcell.Screen, i *Input, t Theme) {
 	topMargin := topMargin + 11
 	promptStyle := tcell.StyleDefault.Foreground(t.Prompt)
 	drawRune(s, leftMargin, topMargin, promptStyle, '❯')
@@ -219,8 +219,8 @@ func idxToSquare(rIdx chess.Rank, fIdx int) string {
 	return fmt.Sprintf("%v%v", idxToFile(fIdx), idxToRank(rIdx))
 }
 
-// DrawMoves displays recent moves
-func DrawMoves(s tcell.Screen, game *chess.Game, t Theme) {
+// drawMoves displays recent moves
+func drawMoves(s tcell.Screen, game *chess.Game, t Theme) {
 	leftMargin := leftMargin + 22
 	boxStyle := tcell.StyleDefault.Foreground(t.MoveBox)
 	drawText(s, leftMargin, topMargin, boxStyle, "┏━━━━━━━━━━━━━━━━━━━━━┓")
@@ -300,8 +300,8 @@ func hintSq(move *chess.Move, sq string) bool {
 	return false
 }
 
-// DrawBoard draws the board on the screen
-func DrawBoard(s tcell.Screen, game *chess.Game, t Theme, checkWhite, checkBlack bool, hint *chess.Move) {
+// drawBoard draws the board on the screen
+func drawBoard(s tcell.Screen, game *chess.Game, t Theme, checkWhite, checkBlack bool, hint *chess.Move) {
 	pos := game.Position()
 	board := pos.Board()
 	row := topMargin

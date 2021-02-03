@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/tmountain/uchess"
+	uchess "github.com/tmountain/uchess/pkg"
 )
 
 func check(e error) {

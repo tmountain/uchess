@@ -97,10 +97,10 @@ func MatchStockfishWin(file string) bool {
 	return stockfishExe.MatchString(file)
 }
 
-// FindStockfish scans a directory and looks for a stockfish binary. Upon
+// SearchDirForStockfish scans a directory and looks for a stockfish binary. Upon
 // matching, a string with the binary name is returned. If no match is found,
 // an empty string is returned
-func FindStockfish(dir string) string {
+func SearchDirForStockfish(dir string) string {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -190,7 +190,8 @@ func findTmpStockfish(dlDir string) (string, error) {
 	return "", nil
 }
 
-func stockfishFilename() string {
+// StockfishFilename returns a platform specific filename for the Stockfish binary
+func StockfishFilename() string {
 	if runtime.GOOS == "windows" {
 		return "stockfish.exe"
 	}
@@ -237,7 +238,7 @@ func downloadStockfish() bool {
 
 	// Move and rename the extracted binary
 	if uchessDir := ensureUchessDir(); uchessDir != "" {
-		finalPath := path.Join(uchessDir, stockfishFilename())
+		finalPath := path.Join(uchessDir, StockfishFilename())
 		if err = os.Rename(sfPath, finalPath); err != nil {
 			fmt.Println(err.Error())
 			return false
@@ -253,6 +254,17 @@ func uchessDirName() string {
 	return ".uchess"
 }
 
+// AppDir returns the uchess directory location
+func AppDir() string {
+	homeDir, err := homedir.Dir()
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+	return path.Join(homeDir, uchessDirName())
+}
+
 func pathDelim() string {
 	if runtime.GOOS == "windows" {
 		return ";"
@@ -260,33 +272,32 @@ func pathDelim() string {
 	return ":"
 }
 
-// FindOrFetchStockfish attempts to load Stockfish via the path and attempts
-// to download the binary for a limited number of platforms
-func FindOrFetchStockfish() string {
+// FindStockfish attempts to find Stockfish in the PATH and config dir
+// A string with the path is returned when found, an empty string is returned otherwise
+func FindStockfish() string {
 	pathDelim := pathDelim()
 	osPath := os.Getenv("PATH")
 	paths := strings.Split(osPath, pathDelim)
-	homeDir, err := homedir.Dir()
-	uchessDir := path.Join(homeDir, uchessDirName())
-
-	if err != nil {
-		fmt.Println(err.Error())
-	} else {
-		paths = append(paths, uchessDir)
+	appDir := AppDir()
+	if appDir != "" && FileExists(appDir) {
+		paths = append(paths, appDir)
 	}
 
-	foundStockfish := false
-	fmt.Println("Looking for stockfish...")
 	for _, p := range paths {
-		fmt.Printf("Check: %v\n", p)
-		searchResult := FindStockfish(p)
+		searchResult := SearchDirForStockfish(p)
 		if searchResult != "" {
-			fmt.Printf("Found: %v%v%v\n", p, string(os.PathSeparator), searchResult)
 			return path.Join(p, searchResult)
 		}
 	}
+	return ""
+}
 
-	if !foundStockfish {
+// FetchStockfish attempts to load Stockfish via the path and attempts
+// to download the binary for a limited number of platforms
+func FetchStockfish() string {
+	stockfish := FindStockfish()
+
+	if stockfish == "" {
 		fmt.Printf("\nStockfish could not be found in your path.\n")
 
 		if (runtime.GOOS == "windows" || runtime.GOOS == "linux") && runtime.GOARCH == "amd64" {
@@ -302,14 +313,14 @@ func FindOrFetchStockfish() string {
 				success := downloadStockfish()
 
 				if success {
-					fmt.Println("Install was successful. Restart uchess.")
+					fmt.Printf("Install was successful. Restart uchess.\n\n")
 					os.Exit(0)
 				} else {
-					fmt.Println("Install was unsuccessful. Please install Stockfish manually.")
+					fmt.Printf("Install was unsuccessful. Please install Stockfish manually.\n\n")
 					os.Exit(0)
 				}
 			} else {
-				fmt.Println("Please see the docs for manual Stockfish configuration.")
+				fmt.Printf("Please see the docs for manual Stockfish configuration.\n\n")
 				os.Exit(0)
 			}
 		} else {
@@ -317,7 +328,7 @@ func FindOrFetchStockfish() string {
 			fmt.Println("Please install Stockfish using your package manager ")
 			fmt.Println("or download a binary from the official website and ")
 			fmt.Printf("make sure the executable is in your path.\n\n")
-			fmt.Println("https://stockfishchess.org/download/")
+			fmt.Printf("https://stockfishchess.org/download/\n\n")
 			os.Exit(0)
 		}
 	}
