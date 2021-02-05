@@ -51,12 +51,9 @@ $ go get github.com/tmountain/uchess/cmd/uchess
 ## Build
 
 **uchess** includes a Makefile which will build a binary
-for your native architecture. Building uchess requires the
-[pkger](https://github.com/markbates/pkger) binary, which
-is also installed via "go get".
+for your native architecture.
 
 ```bash
-$ go get github.com/markbates/pkger/cmd/pkger
 $ make build
 $ cmd/uchess/uchess
 ```
@@ -81,7 +78,15 @@ go get -u github.com/tmountain/uchess/cmd/uchess
 
 ## Usage
 
-### Generate a **uchess** config and edit it accordingly.
+### The easy way: zero configuration
+
+With no arguments specified, uchess will attempt to locate stockfish
+in your path and run it with difficulty level 20. 
+
+If stockfish cannot be found, uchess provides for an automated installation
+on Linux and Windows. Automated install for Mac is a work in progress.
+
+### The manual way: generate a **uchess** config and edit it accordingly.
 
 Mac and Linux
 
@@ -110,8 +115,6 @@ Windows
 > .\uchess.exe -cfg uchess.json
 ```
 
-With zero configuration, uchess will attempt to locate stockfish
-on your system and run it with difficulty level 20.
 
 ### Commands
 
@@ -250,9 +253,7 @@ values. It is recommended to limit colors to the spectrum supported by
 your terminal. xterm-256 (8-bit color) is the official standard for
 builtin themes.
 
-The builtin themes are packaged into the uchess binary using pkger, and
-it is necessary to invoke this command before compilation when a theme
-is added to the [themes project directory](/themes).
+The builtin themes are packaged into the uchess binary using Golang's embed package. New themes should be added to the [themes project directory](/themes).
 
 Pull requests for new builtin themes are welcome; however, the specified
 colors must fall under the xterm-256 standard. A color chart is available
@@ -306,7 +307,6 @@ only UCI engine that is officially supported.
 **uchess** depends on the [notnil/chess](https://github.com/notnil/chess),
 and [freeve/uci](https://github.com/freeeve/uci), and
 [gdamore/tcell](https://github.com/gdamore/tcell) modules.
-Themes are bundled using [markbates/pkger](https://github.com/markbates/pkger).
 Many thanks to the maintainers.
 
 Lastly, **uchess** is heavily inspired by [nickzuber/chs](https://github.com/nickzuber/chs).
