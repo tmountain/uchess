@@ -8,9 +8,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"path/filepath"
 
 	"os"
-	"path"
 	"regexp"
 	"runtime"
 	"strings"
@@ -108,7 +108,7 @@ func SearchDirForStockfish(dir string) string {
 	}
 
 	for _, f := range files {
-		fullPath := path.Join(dir, f.Name())
+		fullPath := filepath.Join(dir, f.Name())
 		if runtime.GOOS == "windows" && MatchStockfishWin(f.Name()) {
 			return f.Name()
 		}
@@ -128,7 +128,7 @@ func ensureUchessDir() string {
 		return ""
 	}
 
-	uchessDir := path.Join(home, uchessDirName())
+	uchessDir := filepath.Join(home, uchessDirName())
 	if !FileExists(uchessDir) {
 		err = os.Mkdir(uchessDir, os.ModeDir)
 		if err != nil {
@@ -184,7 +184,7 @@ func findTmpStockfish(dlDir string) (string, error) {
 	for _, file := range files {
 		fileName := file.Name()
 		if isStockfishBin(fileName) {
-			return path.Join(dlDir, fileName), nil
+			return filepath.Join(dlDir, fileName), nil
 		}
 	}
 	return "", nil
@@ -218,7 +218,7 @@ func downloadStockfish() bool {
 	defer os.RemoveAll(dlDir)
 
 	// dlPath is the full path that the initial zip was saved to
-	dlPath := path.Join(dlDir, "stockfish.zip")
+	dlPath := filepath.Join(dlDir, "stockfish.zip")
 	if err = DownloadFile(stockfish, dlPath); err != nil {
 		fmt.Println(err.Error())
 		return false
@@ -238,7 +238,7 @@ func downloadStockfish() bool {
 
 	// Move and rename the extracted binary
 	if uchessDir := ensureUchessDir(); uchessDir != "" {
-		finalPath := path.Join(uchessDir, StockfishFilename())
+		finalPath := filepath.Join(uchessDir, StockfishFilename())
 		if err = os.Rename(sfPath, finalPath); err != nil {
 			fmt.Println(err.Error())
 			return false
@@ -262,7 +262,7 @@ func AppDir() string {
 		fmt.Println(err.Error())
 		return ""
 	}
-	return path.Join(homeDir, uchessDirName())
+	return filepath.Join(homeDir, uchessDirName())
 }
 
 func pathDelim() string {
@@ -286,7 +286,7 @@ func FindStockfish() string {
 	for _, p := range paths {
 		searchResult := SearchDirForStockfish(p)
 		if searchResult != "" {
-			return path.Join(p, searchResult)
+			return filepath.Join(p, searchResult)
 		}
 	}
 	return ""

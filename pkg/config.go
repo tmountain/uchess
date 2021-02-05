@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path"
+	"path/filepath"
 )
 
 //go:embed themes/*
@@ -107,7 +108,7 @@ func MakeDefault() Config {
 
 	// If stockfish cannot be found, set the config to the AppDir
 	if stockfish == "" {
-		stockfish = path.Join(AppDir(), StockfishFilename())
+		stockfish = filepath.Join(AppDir(), StockfishFilename())
 	}
 
 	engine.Path = stockfish
