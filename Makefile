@@ -12,7 +12,6 @@ tidy:
 	$(GO_BIN) mod tidy -v
 
 build: tidy
-	pkger -o cmd/uchess
 	cd cmd/uchess && $(GO_BIN) build -v .
 	make tidy
 
