@@ -1,14 +1,15 @@
 package uchess
 
 import (
+	"embed"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path"
-
-	"github.com/markbates/pkger"
 )
+
+//go:embed themes/*
+var content embed.FS
 
 // Config defines the configurable parameters for UCI
 type Config struct {
@@ -63,21 +64,22 @@ const defaultFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 // ReadThemes reads packaged theme data into a ThemeHex data slice
 func ReadThemes() []ThemeHex {
 	var themes []ThemeHex
-	pkger.Walk("/themes", func(path string, info os.FileInfo, err error) error {
-		var theme ThemeHex
-		f, err := pkger.Open(path)
+	var theme ThemeHex
+	files, err := content.ReadDir("themes")
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, file := range files {
+		bytes, err := content.ReadFile(path.Join("themes", file.Name()))
 		if err != nil {
 			panic(err)
 		}
-		defer f.Close()
+		json.Unmarshal(bytes, &theme)
+		themes = append(themes, theme)
+	}
 
-		if !info.IsDir() {
-			msgBytes, _ := ioutil.ReadAll(f)
-			json.Unmarshal(msgBytes, &theme)
-			themes = append(themes, theme)
-		}
-		return nil
-	})
 	return themes
 }
 
