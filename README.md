@@ -98,7 +98,7 @@ Windows
 
 ```
 # Avoid BOM in config file
-> .\uchess.exe -tpl | set-content uchess.json -Encoding Ascii
+> .\uchess.exe -tmpl | set-content uchess.json -Encoding Ascii
 ```
 
 Run **uchess** on the config.
