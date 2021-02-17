@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
-	"github.com/freeeve/uci"
 	"github.com/notnil/chess"
 	"github.com/notnil/chess/image"
+	"github.com/notnil/chess/uci"
 )
 
 // selectEngine returns the UCI engine and its corresponding config based upon the current turn
@@ -29,20 +30,17 @@ func selectEngine(game *chess.Game, us UCIState) (*uci.Engine, *UCIEngine) {
 // game position identifies as active
 func EngScore(game *chess.Game, us UCIState, config Config) int {
 	eng, _ := selectEngine(game, us)
-	// Set some result filter options
-	resultOpts := uci.HighestDepthOnly | uci.IncludeUpperbounds | uci.IncludeLowerbounds
 	// Update the engine on the game position
-	eng.SetFEN(game.Position().String())
+	cmdPos := uci.CmdPosition{Position: game.Position()}
 	// Do a quick analysis of the current board
-	results, _ := eng.GoDepth(10, resultOpts)
-	resultLen := len(results.Results)
-	// Some super minimal UCI engines don't report the score
-	// This prevents a crash
-	if resultLen > 0 {
-		return results.Results[resultLen-1].Score
+	cmdGo := uci.CmdGo{Depth: 10}
+	// If the command fails for some reason, exit
+	if err := eng.Run(cmdPos, cmdGo); err != nil {
+		panic(err)
 	}
-	// Default to reporting 0 for lack of a better option
-	return 0
+	info := eng.SearchResults().Info
+	// Return the score in centipawns
+	return info.Score.CP
 }
 
 // EngMove executes a move using the UCI engine
@@ -50,24 +48,24 @@ func EngMove(game *chess.Game, us UCIState, config Config) string {
 	eng, engCfg := selectEngine(game, us)
 
 	// Update the engine on the game position
-	eng.SetFEN(game.Position().String())
-	// Set some result filter options
-	resultOpts := uci.HighestDepthOnly | uci.IncludeUpperbounds | uci.IncludeLowerbounds
-	results, _ := eng.Go(engCfg.Depth, engCfg.SearchMoves, engCfg.MoveTime, resultOpts)
-	// Take the best move
-	bestMove := results.BestMove
-	// Convert the game position to long algebraic notation
-	move, err := chess.LongAlgebraicNotation{}.Decode(game.Position(), bestMove)
-	// This should never happen unless the UCI returns invalid notation
-	if err != nil {
-		return "\u26A0 Error. Engine notation."
+	cmdPos := uci.CmdPosition{Position: game.Position()}
+	// Params to send to the engine
+	cmdGo := &uci.CmdGo{Depth: engCfg.Depth}
+	cmdGo.MoveTime = engCfg.MoveTime * time.Millisecond
+	// If SearchMoves is specified, include it
+	if engCfg.SearchMoves != "" {
+		cmdGo.SearchMoves = searchMoves(engCfg.SearchMoves)
 	}
-
-	// This should never happen unless the UCI returns an invalid move
-	if err = game.Move(move); err != nil {
+	// Run the actual commands
+	if err := eng.Run(cmdPos, *cmdGo); err != nil {
+		return "\u26A0 Error. Engine command."
+	}
+	// Fetch the results
+	move := eng.SearchResults().BestMove
+	// Validate the move
+	if err := game.Move(move); err != nil {
 		return "\u26A0 Error. Engine move."
 	}
-
 	// Clear the label
 	return strings.Repeat(" ", 32)
 }
@@ -128,21 +126,22 @@ func hint(gs *GameState) string {
 	eng := gs.UCI.UciHint
 	engCfg := gs.UCI.CfgHint
 	// Update the engine on the game position
-	eng.SetFEN(gs.Game.Position().String())
-	// Set some result filter options
-	resultOpts := uci.HighestDepthOnly | uci.IncludeUpperbounds | uci.IncludeLowerbounds
-	results, _ := eng.Go(engCfg.Depth, engCfg.SearchMoves, engCfg.MoveTime, resultOpts)
-	// Take the best move
-	bestMove := results.BestMove
-	// Convert the game position to long algebraic notation
-	move, err := chess.LongAlgebraicNotation{}.Decode(gs.Game.Position(), bestMove)
-	// This should never happen unless the UCI returns invalid notation
-	if err != nil {
-		return "\u26A0 Error. Engine notation."
+	cmdPos := uci.CmdPosition{Position: gs.Game.Position()}
+	// Params to send to the engine
+	cmdGo := &uci.CmdGo{Depth: engCfg.Depth}
+	cmdGo.MoveTime = engCfg.MoveTime * time.Millisecond
+	// If SearchMoves is specified, include it
+	if engCfg.SearchMoves != "" {
+		cmdGo.SearchMoves = searchMoves(engCfg.SearchMoves)
 	}
-
+	// Run the actual commands
+	if err := eng.Run(cmdPos, *cmdGo); err != nil {
+		return "\u26A0 Error. Engine command."
+	}
+	// Take the best move
+	bestMove := eng.SearchResults().BestMove
 	// Success, set the move in the game state
-	gs.Hint = move
+	gs.Hint = bestMove
 	return strings.Repeat(" ", 80)
 }
 

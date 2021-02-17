@@ -2,6 +2,7 @@ package uchess
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"runtime"
@@ -14,6 +15,39 @@ import (
 // getSquare returns a chess square given a file and a rank
 func getSquare(f chess.File, r chess.Rank) chess.Square {
 	return chess.Square((int(r) * 8) + int(f))
+}
+
+func filter(vs []string, f func(string) bool) []string {
+	vsf := make([]string, 0)
+	for _, v := range vs {
+		if f(v) {
+			vsf = append(vsf, v)
+		}
+	}
+	return vsf
+}
+
+func searchElements(searchMoves string) []string {
+	f := func(c rune) bool {
+		return c == ' '
+	}
+	return strings.FieldsFunc(searchMoves, f)
+}
+
+func searchMoves(searchMoves string) []*chess.Move {
+	var moves []*chess.Move
+	len4 := func(elem string) bool {
+		return len(elem) == 4
+	}
+	searchElems := filter(searchElements(searchMoves), len4)
+	for _, elem := range searchElems {
+		move, err := chess.UCINotation{}.Decode(chess.StartingPosition(), elem)
+		if err != nil {
+			log.Fatalf("%+v", err)
+		}
+		moves = append(moves, move)
+	}
+	return moves
 }
 
 // color calculates the color of the current square

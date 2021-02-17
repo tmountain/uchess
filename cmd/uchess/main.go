@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/gdamore/tcell/v2"
@@ -29,10 +28,12 @@ func main() {
 
 	// Load the FEN if applicable
 	fen, err := chess.FEN(gs.Config.FEN)
-	if err == nil {
-		gs.Game = chess.NewGame(fen)
+	if err != nil {
+		panic(err)
 	}
 
+	// This encapsulates the ongoing game state
+	gs.Game = chess.NewGame(fen)
 	// Connect to the UCI engines
 	cfgWhite, cfgBlack, cfgHint := uchess.ImportEngines(gs.Config.UCIWhite, gs.Config.UCIBlack, gs.Config.UCIHint, gs.Config.UCIEngines)
 	uciWhite, uciBlack, uciHint := uchess.InitEngines(gs.Config)
@@ -49,19 +50,16 @@ func main() {
 	// Initialize screen
 	gs.S, err = tcell.NewScreen()
 	if err != nil {
-		log.Fatalf("%+v", err)
+		panic(err)
 	}
 	if err := gs.S.Init(); err != nil {
-		log.Fatalf("%+v", err)
+		panic(err)
 	}
 	gs.S.SetStyle(uchess.DefStyle)
 	gs.S.Clear()
 
 	// Input buffer
 	gs.Input = uchess.NewInput()
-	// Sync the engine with the game FEN
-	gs.UCI.UciWhite.SetFEN(gs.Game.Position().String())
-	gs.UCI.UciBlack.SetFEN(gs.Game.Position().String())
 	// This handles if the CPU is white (going first)
 	if uchess.IsCPU(gs.Game.Position().Turn(), gs.Config) {
 		// Render before the CPU goes to avoid a blank screen

@@ -1,7 +1,10 @@
 package uchess
 
 import (
-	"github.com/freeeve/uci"
+	"fmt"
+	"time"
+
+	"github.com/notnil/chess/uci"
 )
 
 // Option allows arbitrary UCI options to be sent
@@ -12,16 +15,16 @@ type Option struct {
 
 // UCIEngine defines a UCIEngine configuration
 type UCIEngine struct {
-	Name        string   `json:"name"`
-	Path        string   `json:"engine"`
-	Hash        int      `json:"hash"`
-	Ponder      bool     `json:"ponder"`
-	OwnBook     bool     `json:"ownBook"`
-	MultiPV     int      `json:"multiPV"`
-	Depth       int      `json:"depth"`
-	SearchMoves string   `json:"searchMoves"`
-	MoveTime    int64    `json:"moveTime"`
-	Options     []Option `json:"options"`
+	Name        string        `json:"name"`
+	Path        string        `json:"engine"`
+	Hash        int           `json:"hash"`
+	Ponder      bool          `json:"ponder"`
+	OwnBook     bool          `json:"ownBook"`
+	MultiPV     int           `json:"multiPV"`
+	Depth       int           `json:"depth"`
+	SearchMoves string        `json:"searchMoves"`
+	MoveTime    time.Duration `json:"moveTime"`
+	Options     []Option      `json:"options"`
 }
 
 // UCIState holds the UCI engine state
@@ -36,16 +39,18 @@ type UCIState struct {
 
 // cfgEngines configures the UCI engine
 func cfgEngines(eng *uci.Engine, cfg *UCIEngine) {
-	eng.SetOptions(uci.Options{
-		Hash:    cfg.Hash,
-		Ponder:  cfg.Ponder,
-		OwnBook: cfg.OwnBook,
-		MultiPV: cfg.MultiPV,
-	})
+	optHash := uci.CmdSetOption{Name: "hash", Value: fmt.Sprintf("%v", cfg.Hash)}
+	optPonder := uci.CmdSetOption{Name: "ponder", Value: fmt.Sprintf("%v", cfg.Ponder)}
+	optOwnBook := uci.CmdSetOption{Name: "ownbook", Value: fmt.Sprintf("%v", cfg.OwnBook)}
+	optMultiPV := uci.CmdSetOption{Name: "multipv", Value: fmt.Sprintf("%v", cfg.MultiPV)}
+
+	if err := eng.Run(uci.CmdUCI, uci.CmdIsReady, optHash, optPonder, optOwnBook, optMultiPV, uci.CmdUCINewGame); err != nil {
+		panic(err)
+	}
 
 	// Send any custom options that were specified
 	for _, option := range cfg.Options {
-		eng.SendOption(option.Name, option.Value)
+		uci.CmdSetOption{Name: option.Name, Value: option.Value}.ProcessResponse(eng)
 	}
 }
 
@@ -56,19 +61,19 @@ func InitEngines(config Config) (*uci.Engine, *uci.Engine, *uci.Engine) {
 	cfgWhite, cfgBlack, cfgHint := ImportEngines(config.UCIWhite, config.UCIBlack, config.UCIHint, config.UCIEngines)
 	var engWhite, engBlack, engHint *uci.Engine
 
-	engWhite, err := uci.NewEngine(cfgWhite.Path)
+	engWhite, err := uci.New(cfgWhite.Path)
 	if err != nil {
 		panic(err)
 	}
 	cfgEngines(engWhite, cfgWhite)
 
-	engBlack, err = uci.NewEngine(cfgBlack.Path)
+	engBlack, err = uci.New(cfgBlack.Path)
 	if err != nil {
 		panic(err)
 	}
 	cfgEngines(engBlack, cfgBlack)
 
-	engHint, err = uci.NewEngine(cfgHint.Path)
+	engHint, err = uci.New(cfgHint.Path)
 	if err != nil {
 		panic(err)
 	}

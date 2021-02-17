@@ -51,7 +51,7 @@ var defaultEngine = UCIEngine{
 	false,       // Ponder
 	false,       // OwnBook
 	4,           // MultiPV
-	0,           // Depth
+	20,          // Depth
 	"",          // SearchMoves
 	3000,        // MoveTime
 	DefaultOptions,
@@ -148,7 +148,7 @@ func ReadConfig(file string) Config {
 		}
 	}
 
-	// Load user defind themes from the config
+	// Load user defined themes from the config
 	for _, theme := range config.Themes {
 		allThemes = append(allThemes, theme)
 	}

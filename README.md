@@ -43,6 +43,7 @@ The easiest way to get **uchess** is via an
 **uchess** can also be installed using "go get".
 A valid GOPATH is required to use the `go get` command.
 If $GOPATH is not specified, $HOME/go will be used by default.
+Make sure $GOPATH/bin is in your $PATH so your shell can find the binary.
 
 ```bash
 $ go get github.com/tmountain/uchess/cmd/uchess
@@ -72,8 +73,6 @@ dist
 │   └── uchess
 └── uchess_windows_amd64
     └── uchess.exe
-=======
-go get -u github.com/tmountain/uchess/cmd/uchess
 ```
 
 ## Usage
@@ -81,7 +80,7 @@ go get -u github.com/tmountain/uchess/cmd/uchess
 ### The easy way: zero configuration
 
 With no arguments specified, uchess will attempt to locate stockfish
-in your path and run it with difficulty level 20. 
+in your path and run it with difficulty level 20.
 
 If stockfish cannot be found, uchess provides for an automated installation
 on Linux and Windows. Automated install for Mac is a work in progress.
@@ -245,6 +244,9 @@ keys are supported for UCI configuration.
   options        Key-value pairs for arbitrary engine commands.
 ```
 
+Note: when depth and searchMoves are both specified, the default behavior
+for Stockfish seems to be using whichever limit terminates the soonest.
+
 ### Themes
 uchess is fully themeable, and user specified themes may be added to the
 uchess config file. The theme keys are named in a manner which is intended to
@@ -298,15 +300,9 @@ cycle forward one move each time tne enter key is pressed.
 are subject to change. Efforts will be made to keep the config file and
 theme format stable going forward to the extent that it is practical to do so.
 
-### Bugs
-Some UCI chess engines currently fail due to a lack of proper initialization.
-This will be resolved in a future release. For the moment, stockfish is the
-only UCI engine that is officially supported.
-
 ### Special Thanks
 **uchess** depends on the [notnil/chess](https://github.com/notnil/chess),
-and [freeve/uci](https://github.com/freeeve/uci), and
-[gdamore/tcell](https://github.com/gdamore/tcell) modules.
+and [gdamore/tcell](https://github.com/gdamore/tcell) modules.
 Many thanks to the maintainers.
 
 Lastly, **uchess** is heavily inspired by [nickzuber/chs](https://github.com/nickzuber/chs).
