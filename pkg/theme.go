@@ -160,12 +160,12 @@ var ThemeBasic = Theme{
 	"basic",            // Name
 	tcell.Color252,     // MoveLabelBg
 	tcell.ColorBlack,   // MoveLabelFg
-	tcell.Color172,     // SquareDark
-	tcell.Color215,     // SquareLight
-	tcell.Color85,      // SquareHigh
-	tcell.Color141,     // SquareHint
-	tcell.Color212,     // SquareCheck
-	tcell.Color255,     // White
+	tcell.Color188,     // SquareDark
+	tcell.Color230,     // SquareLight
+	tcell.Color226,     // SquareHigh
+	tcell.Color223,     // SquareHint
+	tcell.Color218,     // SquareCheck
+	tcell.Color232,     // White
 	tcell.Color232,     // Black
 	tcell.Color160,     // Msg
 	tcell.Color247,     // Rank

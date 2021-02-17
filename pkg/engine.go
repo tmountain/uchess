@@ -43,14 +43,14 @@ func cfgEngines(eng *uci.Engine, cfg *UCIEngine) {
 	optPonder := uci.CmdSetOption{Name: "ponder", Value: fmt.Sprintf("%v", cfg.Ponder)}
 	optOwnBook := uci.CmdSetOption{Name: "ownbook", Value: fmt.Sprintf("%v", cfg.OwnBook)}
 	optMultiPV := uci.CmdSetOption{Name: "multipv", Value: fmt.Sprintf("%v", cfg.MultiPV)}
-
-	if err := eng.Run(uci.CmdUCI, uci.CmdIsReady, optHash, optPonder, optOwnBook, optMultiPV, uci.CmdUCINewGame); err != nil {
-		panic(err)
-	}
-
+	uciArgs := []uci.Cmd{uci.CmdUCI, uci.CmdIsReady, optHash, optPonder, optOwnBook, optMultiPV, uci.CmdUCINewGame}
 	// Send any custom options that were specified
 	for _, option := range cfg.Options {
-		uci.CmdSetOption{Name: option.Name, Value: option.Value}.ProcessResponse(eng)
+		uciArgs = append(uciArgs, uci.CmdSetOption{Name: option.Name, Value: option.Value})
+	}
+
+	if err := eng.Run(uciArgs...); err != nil {
+		panic(err)
 	}
 }
 

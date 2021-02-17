@@ -1,6 +1,6 @@
 module github.com/tmountain/uchess
 
-go 1.13
+go 1.16
 
 require (
 	github.com/codeclysm/extract/v3 v3.0.2

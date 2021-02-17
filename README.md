@@ -80,12 +80,12 @@ dist
 ### The easy way: zero configuration
 
 With no arguments specified, uchess will attempt to locate stockfish
-in your path and run it with difficulty level 20.
+in your path and run it with difficulty level 3.
 
 If stockfish cannot be found, uchess provides for an automated installation
 on Linux and Windows. Automated install for Mac is a work in progress.
 
-### The manual way: generate a **uchess** config and edit it accordingly.
+### The manual way: generate a **uchess** config and edit it accordingly
 
 Mac and Linux
 
@@ -293,7 +293,7 @@ cycle forward one move each time tne enter key is pressed.
 
 ### Platform Support
 **uchess** has been tested and confirmed to work on Linux, MacOS, and Windows
-(PowerShell) platforms. It should work with a wide variety of terminals.
+(Windows Terminal) platforms. It should work with a wide variety of terminals.
 
 ### Project Status
 **uchess** is currently in unstable (alpha) status, and its internal APIs

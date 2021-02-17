@@ -40,7 +40,7 @@ func HasTheme(name string, themes []ThemeHex) bool {
 
 // DefaultOptions defines any default UCI options
 var DefaultOptions = []Option{
-	{"skill level", "20"}, // stockfish skill level
+	{"skill level", "3"}, // stockfish skill level
 }
 
 // DefaultEngine is a placeholder for the default UCI engine
@@ -50,10 +50,10 @@ var defaultEngine = UCIEngine{
 	128,         // Hash
 	false,       // Ponder
 	false,       // OwnBook
-	4,           // MultiPV
-	20,          // Depth
+	1,           // MultiPV
+	1,           // Depth
 	"",          // SearchMoves
-	3000,        // MoveTime
+	100,         // MoveTime
 	DefaultOptions,
 }
 

@@ -103,7 +103,6 @@ func MatchStockfishWin(file string) bool {
 func SearchDirForStockfish(dir string) string {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
-		fmt.Println(err.Error())
 		return ""
 	}
 
