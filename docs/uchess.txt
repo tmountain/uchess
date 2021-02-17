@@ -17,21 +17,34 @@ DESCRIPTION
 
   A hint engine is provided to assist players in discovering the best
   move in a given scenario and game state may be walked backward on an
-  as-needed basis to facilitate game tree exploration. 
+  as-needed basis to facilitate game tree exploration.
 
   Game moves are input as algebraic notation via an interactive command
   shell, and a variety of auxillary commands are supported.
 EXAMPLE
+    With no arguments specified, uchess will attempt to locate stockfish
+    in your path and run it with difficulty level 3.
+
+    If stockfish cannot be found, uchess provides for an automated installation
+    on Linux and Windows. Automated install for Mac is a work in progress.
+
+    If manual configuration is required, please do the following:
+
     Generate a uchess config and edit it accordingly.
 
+    Mac and Linux
+
       $ uchess -tmpl > uchess.json
+
+    Windows
+
+      # Avoid BOM in config file
+      > .\uchess.exe -tmpl | set-content uchess.json -Encoding Ascii
+
 
     Run uchess on the config.
 
       $ uchess -cfg uchess.json
-
-    With zero configuration, uchess will attempt to invoke stockfish
-    via /usr/local/bin/stockfish with difficulty level 20.
 OPTIONS
   -help          Display command usage.
   -black         Black piece input <cpu|human>.
@@ -51,7 +64,7 @@ SHELL COMMANDS
   resign         The current player resigns.
   hint           Highlight the recommended move using the hint engine.
   quit           Shutdown uchess immediately without saving game state.
-  
+
   If none of the previous commands are recognized, the input is assumed
   to be a move specified in algebraic notation.
 
@@ -98,13 +111,13 @@ THEMES
   be self-explanatory, and colors are specified by their respective hex
   values. It is recommended to limit colors to the spectrum supported by
   your terminal. xterm-256 (8-bit color) is the official standard for
-  builtin themes. 
+  builtin themes.
 
   The builtin themes are packaged into the uchess binary using pkger, and
   it is necessary to invoke this command before compilation when a theme
   is added to the themes project directory.
 
-  Pull requests for new builtin themes are welcome; however, the specified 
+  Pull requests for new builtin themes are welcome; however, the specified
   colors must fall under the xterm-256 standard. A color chart is available here:
 
   https://en.wikipedia.org/wiki/Xterm#/media/File:Xterm_256color_chart.svg
@@ -136,10 +149,6 @@ CPU MATCHES
   cycle forward one move each time tne enter key is pressed.
 PLATFORM SUPPORT
   uchess has been tested and confirmed to work on Linux, MacOS, and Windows
-  (PowerShell) platforms. It should work with a wide variety of terminals.
-BUGS
-  Some UCI chess engines currently fail due to a lack of proper initialization.
-  This will be resolved in a future release. For the moment, stockfish is the
-  only UCI engine that is officially supported.
+  (Windows Terminal) platforms. It should work with a wide variety of terminals.
 AUTHOR
   Travis Whitton <tinymountain@gmail.com>
