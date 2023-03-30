@@ -87,15 +87,15 @@ func setChecks(gs *uchess.GameState) {
 	gs.CheckBlack = checkBlack
 }
 
+func Quit(gs *uchess.GameState) {
+	gs.S.Fini()
+	os.Exit(0)
+}
+
 // Interact polls user input an dispatches appropriately
 func Interact(gs *uchess.GameState) bool {
 	// This is used to avoid rescoring on every key press
 	rescore := true
-
-	quit := func() {
-		gs.S.Fini()
-		os.Exit(0)
-	}
 
 	// False when playing cpu vs cpu
 	isInteractive := uchess.IsInteractive(gs.Config)
@@ -112,7 +112,7 @@ func Interact(gs *uchess.GameState) bool {
 		switch ev.Key() {
 		// Quit the app
 		case tcell.KeyEscape, tcell.KeyCtrlC:
-			quit()
+			Quit(gs)
 		// Redraw
 		case tcell.KeyCtrlL:
 			gs.S.Sync()
@@ -125,6 +125,26 @@ func Interact(gs *uchess.GameState) bool {
 				// Set the check state in the event that a check happened
 				setChecks(gs)
 				uchess.DrawMsgLabel(gs.S, msg, gs.Theme)
+				// Command quit and game state shutdown are handled in uchess package
+				// Handle the actual process exit here in the main package
+				if msg == "quit" {
+					// Quit the app
+					gs.Input.Clear()
+					uchess.DrawMsgLabel(gs.S, "Press y to confirm quit", gs.Theme)
+					uchess.Render(gs)
+					// Poll a single event to confirm
+					confirm := gs.S.PollEvent()
+					switch confirm := confirm.(type) {
+					case *tcell.EventKey:
+						switch confirm.Key() {
+						case tcell.KeyRune:
+							switch confirm.Rune() {
+							case 'Y', 'y':
+								Quit(gs)
+							}
+						}
+					}
+				}
 				gs.Input.Clear()
 				// Render between moves to show the square that was chosen
 				uchess.Render(gs)

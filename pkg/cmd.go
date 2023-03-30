@@ -145,6 +145,10 @@ func hint(gs *GameState) string {
 	return strings.Repeat(" ", 80)
 }
 
+func quit(gs *GameState) string {
+	return "quit"
+}
+
 // ProcessCmd processes a move request or command
 func ProcessCmd(cmd string, gs *GameState) (string, *chess.Game) {
 	cmd = strings.TrimSpace(cmd)
@@ -171,6 +175,8 @@ func ProcessCmd(cmd string, gs *GameState) (string, *chess.Game) {
 		// Process a move string
 	case "hint":
 		return hint(gs), gs.Game
+	case "quit":
+		return quit(gs), gs.Game
 	default:
 		if err := gs.Game.MoveStr(cmd); err != nil {
 			return "\u26A0 Illegal. Try again.", gs.Game
