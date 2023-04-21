@@ -115,13 +115,21 @@ func InCheck(game *chess.Game) (bool, bool) {
 	return false, false
 }
 
+func nonNegative(a int) int {
+	if a < 0 {
+		return 0
+	}
+	return a
+}
+
 func getCapturedPieces(pieces string, p, b, n, r, q, k string) string {
-	pawns := 8 - strings.Count(pieces, p)
-	bishops := 2 - strings.Count(pieces, b)
-	knights := 2 - strings.Count(pieces, n)
-	rooks := 2 - strings.Count(pieces, r)
-	queens := 1 - strings.Count(pieces, q)
-	kings := 1 - strings.Count(pieces, k)
+	// strings.Repeat(s, count) will panic if argument count is negative
+	pawns := nonNegative(8 - strings.Count(pieces, p))
+	bishops := nonNegative(2 - strings.Count(pieces, b))
+	knights := nonNegative(2 - strings.Count(pieces, n))
+	rooks := nonNegative(2 - strings.Count(pieces, r))
+	queens := nonNegative(1 - strings.Count(pieces, q))
+	kings := nonNegative(1 - strings.Count(pieces, k))
 	return strings.Repeat(p, pawns) +
 		strings.Repeat(b, bishops) +
 		strings.Repeat(n, knights) +
